@@ -1,20 +1,15 @@
 {
   "name": "yy-labs",
   "private": true,
-  "workspaces": [
-    "*/apps/frontend",
-    "packages/*"
-  ],
+  "workspaces": ["*/apps/frontend", "packages/*"],
   "scripts": {
-    "lint": "eslint .",
+    "check": "biome check --write .",
     "typecheck": "tsc --noEmit",
     "create-poc": "bun scripts/create-poc.ts"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
     "@types/bun": "latest",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
-    "eslint": "^8.57.0",
     "lefthook": "^1.6.0",
     "typescript": "^5.4.0"
   }

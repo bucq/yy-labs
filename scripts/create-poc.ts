@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
-import { mkdirSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 const TEMPLATES = ["react", "astro-hono", "nextjs"] as const;
 type Template = (typeof TEMPLATES)[number];
@@ -38,39 +38,66 @@ write(".env.example", "");
 
 // --- frontend ---
 const frontendTsconfig = (ext: "react" | "base") =>
-  JSON.stringify({ extends: `@yy-labs/tsconfig/${ext}` }, null, 2) + "\n";
-
-const frontendEslint = (ext: "react" | "base") =>
-  `/** @type {import("eslint").Linter.Config} */\nmodule.exports = {\n  extends: ["@yy-labs/eslint-config/${ext}"],\n};\n`;
+  `${JSON.stringify({ extends: `@yy-labs/tsconfig/${ext}` }, null, 2)}\n`;
 
 if (template === "react") {
   write(
     "apps/frontend/package.json",
-    JSON.stringify(
+    `${JSON.stringify(
       {
         name: `@yy-labs/${pocName}-frontend`,
         private: true,
         scripts: {
           dev: "vite",
           build: "vite build",
-          lint: "eslint .",
+          check: "biome check .",
           typecheck: "tsc --noEmit",
+          test: "vitest run --passWithNoTests",
         },
         dependencies: { react: "^18.3.0", "react-dom": "^18.3.0" },
         devDependencies: {
           "@vitejs/plugin-react": "^4.3.0",
           vite: "^5.4.0",
+          vitest: "^2.0.0",
+          "@vitest/coverage-v8": "^2.0.0",
+          jsdom: "^25.0.0",
+          "@testing-library/react": "^16.0.0",
+          "@testing-library/jest-dom": "^6.0.0",
         },
       },
       null,
       2
-    ) + "\n"
+    )}\n`
   );
   write("apps/frontend/tsconfig.json", frontendTsconfig("react"));
-  write("apps/frontend/.eslintrc.js", frontendEslint("react"));
   write(
     "apps/frontend/vite.config.ts",
-    `import { defineConfig } from "vite";\nimport react from "@vitejs/plugin-react";\n\nexport default defineConfig({\n  plugins: [react()],\n});\n`
+    `import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
+  },
+});
+`
+  );
+  write("apps/frontend/src/test/setup.ts", `import "@testing-library/jest-dom";\n`);
+  write(
+    "apps/frontend/src/App.test.tsx",
+    `import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import App from "./App";
+
+describe("App", () => {
+  it("renders", () => {
+    render(<App />);
+    expect(screen.getByText("${pocName}")).toBeInTheDocument();
+  });
+});
+`
   );
   write(
     "apps/frontend/src/main.tsx",
@@ -89,7 +116,7 @@ if (template === "react") {
 if (template === "nextjs") {
   write(
     "apps/frontend/package.json",
-    JSON.stringify(
+    `${JSON.stringify(
       {
         name: `@yy-labs/${pocName}-frontend`,
         private: true,
@@ -97,21 +124,58 @@ if (template === "nextjs") {
           dev: "next dev",
           build: "next build",
           start: "next start",
-          lint: "next lint",
+          check: "biome check .",
           typecheck: "tsc --noEmit",
+          test: "vitest run --passWithNoTests",
         },
         dependencies: { next: "^14.2.0", react: "^18.3.0", "react-dom": "^18.3.0" },
-        devDependencies: { "@types/react": "^18.3.0", "@types/react-dom": "^18.3.0" },
+        devDependencies: {
+          "@types/react": "^18.3.0",
+          "@types/react-dom": "^18.3.0",
+          vitest: "^2.0.0",
+          "@vitest/coverage-v8": "^2.0.0",
+          jsdom: "^25.0.0",
+          "@testing-library/react": "^16.0.0",
+          "@testing-library/jest-dom": "^6.0.0",
+        },
       },
       null,
       2
-    ) + "\n"
+    )}\n`
   );
   write("apps/frontend/tsconfig.json", frontendTsconfig("react"));
-  write("apps/frontend/.eslintrc.js", frontendEslint("react"));
   write(
     "apps/frontend/next.config.ts",
     `import type { NextConfig } from "next";\n\nconst config: NextConfig = {};\n\nexport default config;\n`
+  );
+  write(
+    "apps/frontend/vitest.config.ts",
+    `import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
+  },
+});
+`
+  );
+  write("apps/frontend/src/test/setup.ts", `import "@testing-library/jest-dom";\n`);
+  write(
+    "apps/frontend/src/app/page.test.tsx",
+    `import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import Page from "./page";
+
+describe("Page", () => {
+  it("renders", () => {
+    render(<Page />);
+    expect(screen.getByText("${pocName}")).toBeInTheDocument();
+  });
+});
+`
   );
   write(
     "apps/frontend/src/app/page.tsx",
@@ -126,24 +190,23 @@ if (template === "nextjs") {
 if (template === "astro-hono") {
   write(
     "apps/frontend/package.json",
-    JSON.stringify(
+    `${JSON.stringify(
       {
         name: `@yy-labs/${pocName}-frontend`,
         private: true,
         scripts: {
           dev: "astro dev",
           build: "astro build",
-          lint: "eslint .",
+          check: "biome check .",
           typecheck: "tsc --noEmit",
         },
         dependencies: { astro: "^4.15.0" },
       },
       null,
       2
-    ) + "\n"
+    )}\n`
   );
   write("apps/frontend/tsconfig.json", frontendTsconfig("base"));
-  write("apps/frontend/.eslintrc.js", frontendEslint("base"));
   write(
     "apps/frontend/astro.config.ts",
     `import { defineConfig } from "astro/config";\n\nexport default defineConfig({});\n`
@@ -156,27 +219,45 @@ if (template === "astro-hono") {
   // backend (Hono)
   write(
     "apps/backend/package.json",
-    JSON.stringify(
+    `${JSON.stringify(
       {
         name: `@yy-labs/${pocName}-backend`,
         private: true,
         scripts: {
           dev: "bun run --watch src/index.ts",
           build: "bun build src/index.ts --outdir dist",
-          lint: "eslint .",
+          check: "biome check .",
           typecheck: "tsc --noEmit",
+          test: "vitest run --passWithNoTests",
         },
         dependencies: { hono: "^4.6.0" },
+        devDependencies: {
+          vitest: "^2.0.0",
+          "@vitest/coverage-v8": "^2.0.0",
+        },
       },
       null,
       2
-    ) + "\n"
+    )}\n`
   );
   write("apps/backend/tsconfig.json", frontendTsconfig("base"));
-  write("apps/backend/.eslintrc.js", frontendEslint("base"));
   write(
     "apps/backend/src/index.ts",
     `import { Hono } from "hono";\n\nconst app = new Hono();\n\napp.get("/", (c) => c.json({ message: "Hello from ${pocName}" }));\n\nexport default app;\n`
+  );
+  write(
+    "apps/backend/src/index.test.ts",
+    `import { describe, expect, it } from "vitest";
+import app from "./index";
+
+describe("GET /", () => {
+  it("returns hello message", async () => {
+    const res = await app.request("/");
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ message: "Hello from ${pocName}" });
+  });
+});
+`
   );
 }
 

@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const f=JSON.parse(d).tool_input?.file_path||'';process.stdout.write(f);})\" | { read -r f; echo \"$f\" | grep -qE '\\.(ts|tsx|js|jsx)$' && bunx biome check --write \"$f\" || true; }",
+            "statusMessage": "Running biome check --write..."
+          }
+        ]
+      }
+    ]
+  }
+}

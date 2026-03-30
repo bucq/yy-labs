@@ -74,21 +74,9 @@ cd {poc-name}/apps/backend && bun install
 }
 ```
 
-### ESLint
+### Biome
 
-```js
-// {poc-name}/apps/frontend/.eslintrc.js（React）
-module.exports = {
-  extends: ["@yy-labs/eslint-config/react"]
-}
-```
-
-```js
-// {poc-name}/apps/backend/.eslintrc.js（Hono）
-module.exports = {
-  extends: ["@yy-labs/eslint-config/base"]
-}
-```
+ルートの `biome.json` が自動的に継承されるため、各POCで追加設定は不要です。
 
 ## メンバー
 - ...
