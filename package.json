@@ -1,0 +1,15 @@
+{
+  "name": "yy-labs",
+  "private": true,
+  "workspaces": [
+    "*/apps/frontend",
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

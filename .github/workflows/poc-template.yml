@@ -1,0 +1,28 @@
+# POC追加時にこのファイルをコピーして poc-{name}.yml にリネームして使う
+name: POC Template
+
+on:
+  push:
+    paths:
+      - "{poc-name}/**"
+  pull_request:
+    paths:
+      - "{poc-name}/**"
+
+jobs:
+  frontend:
+    uses: ./.github/workflows/_frontend-ci.yml
+    with:
+      working-directory: "{poc-name}/apps/frontend"
+
+  # FastAPIバックエンドの場合はこちらを有効化
+  # backend:
+  #   uses: ./.github/workflows/_backend-fastapi-ci.yml
+  #   with:
+  #     working-directory: "{poc-name}/apps/backend"
+
+  # Honoバックエンドの場合はこちらを有効化
+  # backend:
+  #   uses: ./.github/workflows/_backend-hono-ci.yml
+  #   with:
+  #     working-directory: "{poc-name}/apps/backend"
