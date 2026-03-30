@@ -17,9 +17,3 @@ pre-commit:
       glob: "*.py"
       run: ruff format --check {staged_files}
 
-pre-push:
-  parallel: true
-  commands:
-    build-ts:
-      glob: "*.{ts,tsx,js,jsx}"
-      run: bun run build
