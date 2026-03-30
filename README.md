@@ -1,6 +1,6 @@
-# yy-labs 🧪
+# yy-labs ⚗️ 
 
-個人・チーム開発のPOCを管理するモノレポ
+チーム開発POCを管理するモノレポ
 
 ## 構成
 
@@ -22,28 +22,71 @@ yy-labs/
 └── README.md
 ```
 
+## セットアップ
+
+クローン後に一度だけ実行：
+
+```bash
+bun install        # 依存関係のインストール
+bun lefthook install  # gitフックの登録
+```
+
 ## POCの追加手順
 
-1. `{poc-name}/` ディレクトリを作成
-2. `apps/frontend/` と `apps/backend/` を追加
-3. `.github/workflows/poc-template.yml` をコピーして `poc-{name}.yml` にリネーム
-4. `{poc-name}` を実際のPOC名に置換
+スクリプトで一括生成：
+
+```bash
+bun create-poc <template> <poc-name>
+
+# テンプレート一覧
+bun create-poc react my-poc        # Vite + React
+bun create-poc nextjs my-poc       # Next.js
+bun create-poc astro-hono my-poc   # Astro + Hono
+```
+
+以下が自動生成されます：
+- `{poc-name}/` — アプリ雛形（tsconfig, eslint, package.json, ソースファイル）
+- `.github/workflows/poc-{name}.yml` — CIワークフロー
+
+生成後：
+
+```bash
+cd {poc-name}/apps/frontend && bun install
+# astro-hono の場合
+cd {poc-name}/apps/backend && bun install
+```
 
 ## 共通設定の使い方
 
 ### TSConfig
+
 ```json
-// {poc-name}/apps/frontend/tsconfig.json
+// {poc-name}/apps/frontend/tsconfig.json（React）
 {
   "extends": "@yy-labs/tsconfig/react"
 }
 ```
 
+```json
+// {poc-name}/apps/backend/tsconfig.json（Hono）
+{
+  "extends": "@yy-labs/tsconfig/base"
+}
+```
+
 ### ESLint
+
 ```js
-// {poc-name}/apps/frontend/.eslintrc.js
+// {poc-name}/apps/frontend/.eslintrc.js（React）
 module.exports = {
   extends: ["@yy-labs/eslint-config/react"]
+}
+```
+
+```js
+// {poc-name}/apps/backend/.eslintrc.js（Hono）
+module.exports = {
+  extends: ["@yy-labs/eslint-config/base"]
 }
 ```
 

@@ -10,10 +10,17 @@ on:
       - "{poc-name}/**"
 
 jobs:
+  # Vite + React の場合
   frontend:
     uses: ./.github/workflows/_frontend-ci.yml
     with:
       working-directory: "{poc-name}/apps/frontend"
+
+  # Next.js の場合はこちらに差し替え
+  # frontend:
+  #   uses: ./.github/workflows/_frontend-nextjs-ci.yml
+  #   with:
+  #     working-directory: "{poc-name}/apps/frontend"
 
   # FastAPIバックエンドの場合はこちらを有効化
   # backend:

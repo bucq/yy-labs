@@ -1,0 +1,25 @@
+pre-commit:
+  parallel: true
+  commands:
+    lint-ts:
+      glob: "*.{ts,tsx,js,jsx}"
+      run: bun run lint {staged_files}
+    typecheck-ts:
+      glob: "*.{ts,tsx}"
+      run: bun run typecheck
+    lint-py:
+      glob: "*.py"
+      run: ruff check {staged_files}
+    typecheck-py:
+      glob: "*.py"
+      run: mypy {staged_files}
+    format-py:
+      glob: "*.py"
+      run: ruff format --check {staged_files}
+
+pre-push:
+  parallel: true
+  commands:
+    build-ts:
+      glob: "*.{ts,tsx,js,jsx}"
+      run: bun run build
